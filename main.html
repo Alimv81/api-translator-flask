@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Translate any text</title>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+</head>
+<body>
+    <h1>Translator</h1>
+    <h4>You can translate text from one language to another by pressing the button below</h4>
+    
+    <input type="text" id="text" placeholder="Type your text">
+    <input type="text" id="dest_lang" placeholder="Type your destination language">
+
+    <button id="translate-button" onclick="translateText()">Translate</button>
+
+    <div id="translate-div"></div>
+
+    <script>
+        async function translateText() {
+            const text = document.getElementById('text').value;
+            const dest_lang = document.getElementById('dest_lang').value;
+
+            try {
+                const response = await fetch('/translate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        "text": text,
+                        "dest_lang": dest_lang
+                    })
+                });
+
+                console.log('Response status:', response.status);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+
+                const data = await response.json();
+
+                document.getElementById('translate-div').innerHTML = 
+                    `Original Text: ${data.original_text}<br>Translated Text: ${data.translated_text}<br>Destination Language: ${data.dest_lang}`;
+            } catch (error) {
+                console.error('There was a problem with the fetch operation:', error);
+                document.getElementById('translate-div').innerHTML = 'Error: ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html>
